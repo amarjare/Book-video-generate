@@ -13,7 +13,7 @@ class Cover(pygame.sprite.Sprite):
         gap:int=20,
         pos:int=5,
         fps:int=60,
-        time:float=3.5 
+        time:float=3
     ):
         """
         封面类
@@ -75,11 +75,12 @@ class Cover(pygame.sprite.Sprite):
             screen.blit(img, (x, y))
             x += img.get_width() + self.gap
     
-    def calc_x(self, p:int,tip:int=110, speed:int=10):
+    def calc_x(self, p:int,tip:int=70, speed:int=10):
         """
         计算图片的x坐标, 运动轨迹，先向左，再向右，最终停留在目标位置
         p: 第p帧
-        tip: 转折点，0-self.total_frames，小于tip向左，大于tip向右
+        tip: 转折点，百分比，0-100，小于tip向左，大于tip向右
+        speed: 速度
         return: 图片的x坐标
         """
         # 计算目标x的坐标
@@ -87,13 +88,14 @@ class Cover(pygame.sprite.Sprite):
         # 计算初始x的坐标
         init_x = self.get_target_pos()
         # print((0,init_x), (210*70/100,0), (210,target_x))
-        if p<=tip:
+        frames = int(self.total_frames*tip/100)
+        if p<=frames:
             # 向左移动，x坐标减小
             x = -speed*p
         elif p<=self.total_frames:
-            # 向右一点，x坐标增加。x坐标从(-speed*tip)开始，增加到(target_x-init_x)
-            a = (target_x-init_x - (-speed*tip))/(self.total_frames - tip)
-            k = -speed*tip - a*tip
+            # 向右一点，x坐标增加。x坐标从(-speed*frames)开始，增加到(target_x-init_x)
+            a = (target_x-init_x - (-speed*frames))/(self.total_frames - frames)
+            k = -speed*frames - a*frames
             x = a*p + k
         else:
             x = target_x - init_x
@@ -114,7 +116,7 @@ class BoxSprite(pygame.sprite.Sprite):
         screen_h:int, 
         cover_w:int,
         cover_h:int,
-        time:float=3.5,
+        time:float=3,
         percentage:int=90,
     ):
         """
@@ -177,6 +179,10 @@ def get_screen_size(mode:str, zoom:int=150):
 
 # pygame setup
 pygame.init()
+# 播放背景音乐
+pygame.mixer.init()
+pygame.mixer.music.load("audio.mp3")
+pygame.mixer.music.play(-1)  # 循环播放
 screen_w, screen_h = get_screen_size("16:9", 200)
 # print(screen_w, screen_h)
 screen = pygame.display.set_mode((screen_w, screen_h))
@@ -200,7 +206,6 @@ box = BoxSprite(
     screen_h=screen_h,
     cover_w=cover.images[pos].get_width(),
     cover_h=cover.images[pos].get_height(),
-    time=3.5,
     percentage=200,
 )
 
@@ -224,3 +229,4 @@ while running:
     clock.tick(60)
 
 pygame.quit()
+pygame.mixer.music.stop()  # 停止音乐播放
