@@ -2,7 +2,8 @@ import pygame
 from pathlib import Path
 import random
 
-class Cover(pygame.sprite.Sprite):
+
+class Cover:
     def __init__(
         self, 
         covers_dir:str, 
@@ -25,8 +26,6 @@ class Cover(pygame.sprite.Sprite):
         gap: 图片之间的间距
         pos: 要插入的位置
         """
-
-        super().__init__()
         self.covers_dir = covers_dir
         self.img_path = img_path
         self.screen_w = screen_w
@@ -108,7 +107,7 @@ class Cover(pygame.sprite.Sprite):
             x += one.get_width() + self.gap
         return x
             
-class BoxSprite(pygame.sprite.Sprite):
+class BoxSprite:
     def __init__(
         self, 
         fps:int, 
@@ -129,7 +128,6 @@ class BoxSprite(pygame.sprite.Sprite):
         time: 时间
         percentage: 初始位置百分比
         """
-        super().__init__()
         self.fps = fps
         self.total_frames = int(time * fps)
 
@@ -165,6 +163,58 @@ class BoxSprite(pygame.sprite.Sprite):
 
         pygame.draw.rect(screen, (255, 255, 255), self.get_pos(delta_h), 3)
 
+class Background:
+    def __init__(self, backgrounds_dir: str, screen_w: int, screen_h: int, fps: int = 60, switch_time: float = 10):
+        """
+        背景类
+        backgrounds_dir: 背景图片文件夹路径
+        screen_w: 屏幕宽度
+        screen_h: 屏幕高度
+        fps: 帧率
+        switch_time: 每张图片显示时间（秒）
+        """
+        self.backgrounds_dir = backgrounds_dir
+        self.screen_w = screen_w
+        self.screen_h = screen_h
+        self.fps = fps
+        self.switch_time = switch_time
+        self.total_frames = int(fps * switch_time)
+        self.images = self.load_images()
+        self.num_images = len(self.images)
+
+    def load_images(self):
+        # 读取所有png图片到列表
+        image_list = [str(p) for p in Path(self.backgrounds_dir).glob("*.jpg")]
+        images = []
+        for image in image_list:
+            img = pygame.image.load(image).convert()
+            img_w, img_h = img.get_size()
+            scale_w = self.screen_w / img_w
+            scale_h = self.screen_h / img_h
+            scale = max(scale_w, scale_h)  # 按长边等比例缩放，保证不会出现短边
+            new_w = int(img_w * scale)
+            new_h = int(img_h * scale)
+            scaled_img = pygame.transform.smoothscale(img, (new_w, new_h))
+            images.append(scaled_img)
+        return images
+
+    def update(self, screen: pygame.Surface, p: int):
+        if self.num_images == 0:
+            return
+
+        idx = (p // self.total_frames) % self.num_images
+        img = self.images[idx]
+
+        # 获取原始图片的尺寸
+        img_w, img_h = img.get_size()
+
+        # 计算绘制位置，保持图片中心与屏幕中心对齐
+        x = (self.screen_w - img_w) / 2
+        y = (self.screen_h - img_h) / 2
+        # 将图片绘制到屏幕上
+        screen.blit(img, (x, y))
+
+
 def get_screen_size(mode:str, zoom:int=150):
     """
     获取屏幕大小
@@ -179,16 +229,13 @@ def get_screen_size(mode:str, zoom:int=150):
 
 # pygame setup
 pygame.init()
-# 播放背景音乐
-pygame.mixer.init()
-pygame.mixer.music.load("audio.mp3")
-pygame.mixer.music.play(-1)  # 循环播放
 screen_w, screen_h = get_screen_size("16:9", 200)
+
 # print(screen_w, screen_h)
 screen = pygame.display.set_mode((screen_w, screen_h))
 clock = pygame.time.Clock()
 running = True
-
+fps = 60
 # 创建精灵
 pos=5   # 封面出现的位置
 cover = Cover(
@@ -199,17 +246,31 @@ cover = Cover(
     percentage=50,
     gap=20,
     pos=pos,
+    fps=fps
 )
 box = BoxSprite(
-    fps=60,
+    fps=fps,
     screen_w=screen_w,
     screen_h=screen_h,
     cover_w=cover.images[pos].get_width(),
     cover_h=cover.images[pos].get_height(),
     percentage=200,
 )
+background = Background(
+    backgrounds_dir="backgrounds",
+    screen_w=screen_w,
+    screen_h=screen_h,
+    fps=fps,
+    switch_time=10
+)
 
 p = 0
+# 播放背景音乐
+pygame.mixer.init()
+pygame.mixer.music.load("audio.mp3")
+pygame.mixer.music.play(-1)  # 循环播放
+
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -219,14 +280,26 @@ while running:
 
     screen.fill("purple")
     # 绘制精灵
-    cover.update(screen, p)
-    box.update(screen, p)
+    # 前3.5s
+    if p<=4*fps:
+        cover.update(screen, p)
+        box.update(screen, p)
+    else:
+        background.update(screen, p)
+
+    
     p += 1
     if p%60==0:
         print('第', p//60, '秒')
 
     pygame.display.flip()
-    clock.tick(60)
+    clock.tick(fps)
 
 pygame.quit()
 pygame.mixer.music.stop()  # 停止音乐播放
+
+
+
+
+
+
