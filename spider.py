@@ -5,10 +5,7 @@
 
 import requests
 import os
-import json
 from urllib.parse import quote
-import time
-import random
 from typing import Dict, Optional
 
 
@@ -43,7 +40,7 @@ def get_book_cover_from_douban(book_name: str) -> Optional[Dict]:
         return None
 
 
-def download_cover_image(cover_url: str, book_title: str, save_folder: str = 'Covers') -> Optional[str]:
+def download_cover_image(cover_url: str, book_title: str, save_folder: str = 'covers') -> Optional[str]:
     """
     下载封面图片并保存到指定文件夹
     """
