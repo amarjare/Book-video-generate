@@ -1,13 +1,15 @@
 import pygame
 from pathlib import Path
 import random
+from typing import Optional, Dict, List
+
 
 
 class Cover:
     def __init__(
         self, 
-        covers_dir:str, 
-        img_path:str,
+        covers_dir:Path, 
+        img_path:Path,
         screen_w:int, 
         screen_h:int, 
         percentage:int=60,
@@ -43,6 +45,8 @@ class Cover:
         image_list += [str(p) for p in Path(self.covers_dir).glob("*.jpeg")]
         # 打乱列表
         random.shuffle(image_list)
+        # print(image_list)
+        image_list.remove(str(self.img_path))
         # 取前10张图片加载
         image_list = image_list[:10]
         # 加载图片并缩放图片到屏幕大小
@@ -164,7 +168,7 @@ class BoxSprite:
         pygame.draw.rect(screen, (255, 255, 255), self.get_pos(delta_h), 3)
 
 class Background:
-    def __init__(self, backgrounds_dir: str, screen_w: int, screen_h: int, fps: int = 60, switch_time: float = 10):
+    def __init__(self, backgrounds_dir: Path, screen_w: int, screen_h: int, fps: int = 60, switch_time: float = 10):
         """
         背景类
         backgrounds_dir: 背景图片文件夹路径
@@ -184,7 +188,7 @@ class Background:
 
     def load_images(self):
         # 读取所有png图片到列表
-        image_list = [str(p) for p in Path(self.backgrounds_dir).glob("*.jpg")]
+        image_list = [str(p) for p in Path(self.backgrounds_dir).glob("*")]
         images = []
         for image in image_list:
             img = pygame.image.load(image).convert()
@@ -214,6 +218,114 @@ class Background:
         # 将图片绘制到屏幕上
         screen.blit(img, (x, y))
 
+class Subtitle:
+    def __init__(self, font_path:Path, subtitle_path:Path, screen_w:int, screen_h:int, fps:int = 60):
+        self.font_path = font_path
+        self.subtitle_path = subtitle_path
+        self.screen_w = screen_w
+        self.screen_h = screen_h
+        self.fps = fps
+        self.color = (255, 255, 255)
+        self.font_size = 36
+        self.text = ""
+        self.rect = None
+        
+        # 初始化字体
+        pygame.font.init()
+        self.font = pygame.font.Font(str(font_path), self.font_size)
+        
+        # 解析SRT字幕文件
+        self.subtitles = self._parse_srt()
+    
+    def _parse_srt(self) -> List[Dict[str, str]]:
+        """解析SRT字幕文件"""
+        subtitles = []
+        if not self.subtitle_path.exists():
+            return subtitles
+            
+        with open(self.subtitle_path, 'r', encoding='utf-8') as f:
+            content = f.read().strip()
+        
+        # 按空行分割字幕块
+        blocks = content.split('\n\n')
+        
+        for block in blocks:
+            lines = block.strip().split('\n')
+            if len(lines) >= 3:
+                # 解析时间戳
+                time_line = lines[1]
+                start_time, end_time = time_line.split(' --> ')
+                
+                # 转换时间为毫秒
+                start_ms = self._time_to_ms(start_time)
+                end_ms = self._time_to_ms(end_time)
+                
+                # 获取字幕文本（可能有多行）
+                text = '\n'.join(lines[2:])
+                
+                subtitles.append({
+                    'start': start_ms,
+                    'end': end_ms,
+                    'text': text
+                })
+        
+        return subtitles
+    
+    def _time_to_ms(self, time_str):
+        """将SRT时间格式转换为毫秒"""
+        # 格式: 00:00:01,825
+        time_part, ms_part = time_str.split(',')
+        h, m, s = map(int, time_part.split(':'))
+        ms = int(ms_part)
+        
+        return (h * 3600 + m * 60 + s) * 1000 + ms
+    
+    def _get_current_subtitle(self, current_time_ms):
+        """根据当前时间获取对应的字幕"""
+        for subtitle in self.subtitles:
+            if subtitle['start'] <= current_time_ms <= subtitle['end']:
+                return subtitle['text']
+        return ""
+
+    def update(self, screen:pygame.Surface, p:int):
+        """
+        根据当前帧绘制对应的字幕到屏幕下方居中位置
+        p: 当前帧数
+        """
+        # 计算当前时间（毫秒）
+        current_time_ms = (p / self.fps) * 1000
+        
+        # 获取当前时间对应的字幕
+        current_text = self._get_current_subtitle(current_time_ms)
+        
+        if current_text:
+            # 处理多行文本
+            lines = current_text.split('\n')
+            rendered_lines = []
+            
+            for line in lines:
+                if line.strip():  # 跳过空行
+                    rendered_line = self.font.render(line, True, self.color)
+                    rendered_lines.append(rendered_line)
+            
+            if rendered_lines:
+                # 计算总高度
+                total_height = sum(line.get_height() for line in rendered_lines)
+                line_spacing = 5  # 行间距
+                total_height += line_spacing * (len(rendered_lines) - 1)
+                
+                # 计算起始Y位置（屏幕底部向上偏移）
+                margin_bottom = 50
+                start_y = self.screen_h - margin_bottom - total_height
+                
+                # 绘制每一行
+                current_y = start_y
+                for line_surface in rendered_lines:
+                    # 水平居中
+                    x = (self.screen_w - line_surface.get_width()) // 2
+                    screen.blit(line_surface, (x, current_y))
+                    current_y += line_surface.get_height() + line_spacing
+        
 
 def get_screen_size(mode:str, zoom:int=150):
     """
@@ -227,79 +339,139 @@ def get_screen_size(mode:str, zoom:int=150):
     elif mode == "9:16":
         return int(1080*100/zoom), int(1920*100/zoom),
 
-# pygame setup
-pygame.init()
-screen_w, screen_h = get_screen_size("16:9", 200)
 
-# print(screen_w, screen_h)
-screen = pygame.display.set_mode((screen_w, screen_h))
-clock = pygame.time.Clock()
-running = True
-fps = 60
-# 创建精灵
-pos=5   # 封面出现的位置
-cover = Cover(
-    covers_dir="covers",
-    img_path="文城.jpg",
-    screen_w=screen_w,
-    screen_h=screen_h,
-    percentage=50,
-    gap=20,
-    pos=pos,
-    fps=fps
-)
-box = BoxSprite(
-    fps=fps,
-    screen_w=screen_w,
-    screen_h=screen_h,
-    cover_w=cover.images[pos].get_width(),
-    cover_h=cover.images[pos].get_height(),
-    percentage=200,
-)
-background = Background(
-    backgrounds_dir="backgrounds",
-    screen_w=screen_w,
-    screen_h=screen_h,
-    fps=fps,
-    switch_time=10
-)
+def make_movie(resource_dir:Path, cover_path:Path, book_dir:Path, font_path:Path):
+    # 初始化一些路径
+    cover_dir = resource_dir / "covers"
+    bg_dir = resource_dir / "backgrounds"
 
-p = 0
-# 播放背景音乐
-pygame.mixer.init()
-pygame.mixer.music.load("audio.mp3")
-pygame.mixer.music.play(-1)  # 循环播放
-
-
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-            running = False
-
-    screen.fill("purple")
-    # 绘制精灵
-    # 前3.5s
-    if p<=4*fps:
-        cover.update(screen, p)
-        box.update(screen, p)
+    # 从bgm_dir中随机取一首bgm
+    bgm_dir = resource_dir / "bgm"
+    bgm_files = [p for p in bgm_dir.glob("*.mp3")]
+    print(bgm_files, bgm_dir)
+    if bgm_files:
+        bgm_path = random.choice(bgm_files)
     else:
-        background.update(screen, p)
-
+        raise FileNotFoundError(f"未找到音频文件在 {bgm_dir} 中")
     
-    p += 1
-    if p%60==0:
-        print('第', p//60, '秒')
-
-    pygame.display.flip()
-    clock.tick(fps)
-
-pygame.quit()
-pygame.mixer.music.stop()  # 停止音乐播放
+    # 选择音效
+    effect_path = resource_dir / "effects" / "1.mp3"
+    
+    # 从book_dir中获取音频文件
+    audio_path = next(book_dir.glob("*.mp3"), None)
+    if not audio_path:
+        raise FileNotFoundError(f"未找到音频文件在 {book_dir} 中")
 
 
+    # pygame setup
+    pygame.init()
+    screen_w, screen_h = get_screen_size("16:9", 200)
+
+    # print(screen_w, screen_h)
+    screen = pygame.display.set_mode((screen_w, screen_h))
+    clock = pygame.time.Clock()
+    running = True
+    fps = 60
+    # 创建精灵
+    pos=5   # 封面出现的位置
+    cover = Cover(
+        covers_dir=cover_dir,
+        img_path=cover_path,
+        screen_w=screen_w,
+        screen_h=screen_h,
+        percentage=50,
+        gap=20,
+        pos=pos,
+        fps=fps
+    )
+    box = BoxSprite(
+        fps=fps,
+        screen_w=screen_w,
+        screen_h=screen_h,
+        cover_w=cover.images[pos].get_width(),
+        cover_h=cover.images[pos].get_height(),
+        percentage=200,
+    )
+    background = Background(
+        backgrounds_dir=bg_dir,
+        screen_w=screen_w,
+        screen_h=screen_h,
+        fps=fps,
+        switch_time=10
+    )
+    
+    # 创建字幕对象
+    subtitle_path = next(book_dir.glob("*.srt"), None)
+    subtitle = None
+    if subtitle_path:
+        subtitle = Subtitle(
+            font_path=font_path,
+            subtitle_path=subtitle_path,
+            screen_w=screen_w,
+            screen_h=screen_h,
+            fps=fps
+        )
+
+    p = 0
+    # 配音
+    pygame.mixer.init()
+    copywriter = pygame.mixer.Sound(audio_path)
+    bgm = pygame.mixer.Sound(bgm_path)
+    effects = pygame.mixer.Sound(effect_path)
+    bgm.set_volume(0.3)
+    
+    # 设置配音结束事件
+    COPYWRITER_END = pygame.USEREVENT + 1
+    copywriter_channel = copywriter.play()
+    if copywriter_channel:
+        copywriter_channel.set_endevent(COPYWRITER_END)
+    
+    bgm.play()
+
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                running = False
+            elif event.type == COPYWRITER_END:
+                print("配音播放完毕")
+                running = False
+
+        screen.fill("purple")
+        # 绘制精灵
+        # 前3.5s
+        if p<=4*fps:
+            cover.update(screen, p)
+            box.update(screen, p)
+        else:
+            background.update(screen, p)
+        
+        # 绘制字幕
+        if subtitle:
+            subtitle.update(screen, p)
+
+        if p == 60:
+            effects.play(fade_ms = 1)
+        
+        p += 1
+        if p%60==0:
+            print('第', p//60, '秒')
+
+        pygame.display.flip()
+        clock.tick(fps)
+
+    pygame.quit()
+    pygame.mixer.music.stop()  # 停止音乐播放
 
 
-
-
+if __name__=="__main__":
+    root_dir = Path(__file__).parent
+    file_dir = root_dir / "appdata"
+    resource_dir = root_dir / "resource"
+    cover_dir = resource_dir / 'covers'
+    book_name = "巴别塔"
+    # 使用Pathlib创建同名文件夹
+    book_dir = Path(file_dir) / book_name
+    cover_path = cover_dir / f'{book_name}.jpg'
+    make_movie(resource_dir, cover_path, book_dir, resource_dir / "fonts" / "msyh.ttc")

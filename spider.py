@@ -7,7 +7,7 @@ import requests
 import os
 from urllib.parse import quote
 from typing import Dict, Optional
-
+from pathlib import Path
 
 def get_book_cover_from_douban(book_name: str) -> Optional[Dict]:
     """
@@ -40,19 +40,19 @@ def get_book_cover_from_douban(book_name: str) -> Optional[Dict]:
         return None
 
 
-def download_cover_image(cover_url: str, book_title: str, save_folder: str = 'covers') -> Optional[str]:
+def download_cover_image(cover_url: str, book_title: str, save_dir: Path = 'covers') -> Optional[str]:
     """
     下载封面图片并保存到指定文件夹
     """
     try:
         # 确保保存文件夹存在
-        if not os.path.exists(save_folder):
-            os.makedirs(save_folder)
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
         
         # 清理文件名中的非法字符
         safe_filename = "".join(c for c in book_title if c.isalnum() or c in (' ', '-', '_')).rstrip()
         filename = f"{safe_filename}.jpg"
-        filepath = os.path.join(save_folder, filename)
+        filepath = save_dir / filename
         
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
