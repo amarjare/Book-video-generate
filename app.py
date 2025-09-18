@@ -2,8 +2,9 @@ import pygame
 from pathlib import Path
 import random
 from typing import Optional, Dict, List
-
-
+import cv2
+import numpy as np
+from video_processor import merge_audio_video
 
 class Cover:
     def __init__(
@@ -16,7 +17,7 @@ class Cover:
         gap:int=20,
         pos:int=5,
         fps:int=60,
-        time:float=3
+        time:float=2.5
     ):
         """
         封面类
@@ -119,7 +120,7 @@ class BoxSprite:
         screen_h:int, 
         cover_w:int,
         cover_h:int,
-        time:float=3,
+        time:float=2.5,
         percentage:int=90,
     ):
         """
@@ -399,6 +400,11 @@ def make_movie(resource_dir:Path, cover_path:Path, book_dir:Path, font_path:Path
         fps=fps,
         switch_time=10
     )
+
+    # 视频参数
+    fourcc = cv2.VideoWriter_fourcc(*"XVID")
+    video_path = book_dir / 'video.mp4'
+    video_out = cv2.VideoWriter(video_path, fourcc, fps, (screen_w, screen_h))
     
     # 创建字幕对象
     subtitle_path = next(book_dir.glob("*.srt"), None)
@@ -439,8 +445,8 @@ def make_movie(resource_dir:Path, cover_path:Path, book_dir:Path, font_path:Path
                 running = False
 
         screen.fill("purple")
-        # 绘制精灵
-        # 前3.5s
+
+        # 前4s为片头
         if p<=4*fps:
             cover.update(screen, p)
             box.update(screen, p)
@@ -451,7 +457,7 @@ def make_movie(resource_dir:Path, cover_path:Path, book_dir:Path, font_path:Path
         if subtitle:
             subtitle.update(screen, p)
 
-        if p == 60:
+        if p == 30:
             effects.play(fade_ms = 1)
         
         p += 1
@@ -459,10 +465,39 @@ def make_movie(resource_dir:Path, cover_path:Path, book_dir:Path, font_path:Path
             print('第', p//60, '秒')
 
         pygame.display.flip()
+            # 截取游戏界面
+        screen_shot = pygame.surfarray.array3d(screen)
+        screen_shot = np.transpose(screen_shot, (1, 0, 2))  
+        screen_shot = cv2.cvtColor(screen_shot, cv2.COLOR_RGB2BGR)
+
+        # 将截图写入视频文件
+        video_out.write(screen_shot)  
         clock.tick(fps)
 
     pygame.quit()
-    pygame.mixer.music.stop()  # 停止音乐播放
+    # pygame.mixer.music.stop()  # 停止音乐播放
+    video_out.release()
+    
+    # 使用ffmpeg合成音视频
+    print("开始合成音视频...")
+    final_video_path = book_dir / 'final_video.mp4'
+    success = merge_audio_video(
+        video_path=video_path,
+        audio_path=audio_path,
+        bgm_path=bgm_path,
+        effect_path=effect_path,
+        output_path=final_video_path,
+        bgm_volume=0.5,
+        effect_volume=0.8,
+        effect_start_time=0.5
+    )
+    
+    if success:
+        print(f"最终视频已保存到: {final_video_path}")
+    else:
+        print("音视频合成失败！")
+
+
 
 
 if __name__=="__main__":
