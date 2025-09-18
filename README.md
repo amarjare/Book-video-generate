@@ -176,7 +176,6 @@ Book-video-generate/
 ├── tts_generator.py     # TTS生成器
 ├── video_processor.py   # 视频处理工具
 ├── requirements.txt     # 依赖列表
-├── CLAUDE.md           # 开发文档
 ├── appdata/            # 生成的文件
 └── resource/           # 资源文件
 ```
