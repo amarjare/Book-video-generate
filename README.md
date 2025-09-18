@@ -17,11 +17,17 @@
 
 ## 🖼️ 效果预览
 
+### 示例视频
+点击观看由本工具生成的《巴别塔》书籍推广视频：
+
+[📹 巴别塔 - 示例](https://github.com/SheenHalo/Book-video-generate/blob/main/appdata/%E5%B7%B4%E5%88%AB%E5%A1%94/final_video.mp4)
+
+### 视频特性
 生成的视频包含：
-- 动态封面展示效果
-- 背景图片自动切换
-- 同步字幕显示
-- 多音轨混合（配音 + 背景音乐 + 音效）
+- 🎬 **动态封面展示效果** - 书籍封面滑动动画
+- 🖼️ **背景图片自动切换** - 每10秒切换背景
+- 📝 **同步字幕显示** - 根据音频时长精准同步
+- 🎵 **多音轨混合** - 配音 + 背景音乐 + 音效
 
 ## 📋 系统要求
 
@@ -184,13 +190,5 @@ Book-video-generate/
 ## 📄 许可证
 
 本项目采用MIT许可证 - 详见 [LICENSE](LICENSE) 文件
-
-## 🌟 Star History
-
-如果这个项目对你有帮助，请给个Star支持一下！
-
-[![Star History Chart](https://api.star-history.com/svg?repos=SheenHalo/Book-video-generate&type=Date)](https://star-history.com/#SheenHalo/Book-video-generate&Date)
-
----
 
 **提示**: 首次使用建议先测试简单的书籍名称，确保所有配置正确后再生成复杂视频。
