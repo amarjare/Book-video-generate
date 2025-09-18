@@ -349,7 +349,6 @@ def make_movie(resource_dir:Path, cover_path:Path, book_dir:Path, font_path:Path
     # 从bgm_dir中随机取一首bgm
     bgm_dir = resource_dir / "bgm"
     bgm_files = [p for p in bgm_dir.glob("*.mp3")]
-    print(bgm_files, bgm_dir)
     if bgm_files:
         bgm_path = random.choice(bgm_files)
     else:
@@ -402,7 +401,7 @@ def make_movie(resource_dir:Path, cover_path:Path, book_dir:Path, font_path:Path
     )
 
     # 视频参数
-    fourcc = cv2.VideoWriter_fourcc(*"XVID")
+    fourcc = cv2.VideoWriter_fourcc(*"mp4v")  # 使用mp4v编码器，更好的MP4兼容性
     video_path = book_dir / 'video.mp4'
     video_out = cv2.VideoWriter(video_path, fourcc, fps, (screen_w, screen_h))
     

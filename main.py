@@ -31,7 +31,7 @@ if __name__ == "__main__":
     resource_dir = root_dir / "resource"
     cover_dir = resource_dir / 'covers'
 
-    book_name = "巴别塔"
+    book_name = input("请输入书名: ")
     # 使用Pathlib创建同名文件夹
     book_dir = Path(file_dir) / book_name
     book_dir.mkdir(parents=True, exist_ok=True)
